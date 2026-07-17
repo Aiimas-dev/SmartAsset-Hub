@@ -1,0 +1,102 @@
+# Review package: cfceb91..53656f2
+
+## Commits
+53656f2 feat: add photo upload with preview functionality to profile page
+
+## Files changed
+ resources/views/profile.blade.php | 59 +++++++++++++++++++++++++++------------
+ 1 file changed, 41 insertions(+), 18 deletions(-)
+
+## Diff
+diff --git a/resources/views/profile.blade.php b/resources/views/profile.blade.php
+index 38eceea..225dfc8 100644
+--- a/resources/views/profile.blade.php
++++ b/resources/views/profile.blade.php
+@@ -33,18 +33,17 @@ class="rounded-[35px] bg-gradient-to-r from-sky-500 via-cyan-500 to-emerald-500
+ 
+                     @if($user->photo)
+ 
+-                        <img
+-                            src="{{ asset('storage/'.$user->photo) }}"
+-                            class="w-44 h-44 rounded-full object-cover border-4 border-cyan-400">
++                        <img id="photo-preview"
++                             src="{{ asset('storage/'.$user->photo) }}"
++                             alt="{{ $user->name }}"
++                             class="w-44 h-44 rounded-full object-cover border-4 border-cyan-400">
+ 
+                     @else
+ 
+-                        <div
+-                            class="w-44 h-44 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 flex items-center justify-center text-white text-7xl font-bold">
+-
+-                            {{ strtoupper(substr($user->name,0,1)) }}
+-
+-                        </div>
++                        <img id="photo-preview"
++                             src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0ea5e9&color=fff"
++                             alt="{{ $user->name }}"
++                             class="w-44 h-44 rounded-full border-4 border-cyan-400">
+ 
+                     @endif
+ 
+@@ -60,13 +59,6 @@ class="w-44 h-44 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 flex it
+ 
+                     </p>
+ 
+-                    <button
+-                        class="mt-8 bg-gradient-to-r from-sky-500 to-cyan-500 text-white px-8 py-3 rounded-2xl font-bold">
+-
+-                        📷 Upload Foto
+-
+-                    </button>
+-
+                 </div>
+ 
+             </div>
+@@ -145,7 +137,25 @@ class="mt-8 bg-gradient-to-r from-sky-500 to-cyan-500 text-white px-8 py-3 round
+ 
+                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                     @csrf
+-                    @method('PUT')>
++                    @method('PUT')
++
++                    <div class="mb-6">
++                        <label class="font-semibold">Foto Profil</label>
++                        <div class="mt-2 flex items-center gap-4">
++                            <input type="file"
++                                   name="photo"
++                                   id="photo-input"
++                                   accept="image/*"
++                                   class="hidden"
++                                   onchange="previewImage(this)">
++                            <button type="button"
++                                    onclick="document.getElementById('photo-input').click()"
++                                    class="bg-gradient-to-r from-sky-500 to-cyan-500 text-white px-6 py-2 rounded-xl font-bold">
++                                📷 Upload Foto
++                            </button>
++                            <span id="file-name" class="text-gray-500"></span>
++                        </div>
++                    </div>
+ 
+                     <div class="grid md:grid-cols-2 gap-6">
+ 
+@@ -360,4 +370,17 @@ class="bg-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold hover:bg-slat
+ 
+ </div>
+ 
+-</x-app-layout>
+\ No newline at end of file
++<script>
++function previewImage(input) {
++    if (input.files && input.files[0]) {
++        var reader = new FileReader();
++        reader.onload = function(e) {
++            document.getElementById('photo-preview').src = e.target.result;
++        }
++        reader.readAsDataURL(input.files[0]);
++        document.getElementById('file-name').textContent = input.files[0].name;
++    }
++}
++</script>
++
++</x-app-layout>

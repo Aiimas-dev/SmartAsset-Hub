@@ -1,0 +1,55 @@
+# Review package: aaf21a2..1eaa860
+
+## Commits
+1eaa860 test: add test for birth_date update in profile
+23d1b05 fix: remove date cast from birth_date to prevent dirty detection issues
+
+## Files changed
+ app/Models/User.php           |  1 -
+ tests/Feature/ProfileTest.php | 23 +++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+
+## Diff
+diff --git a/app/Models/User.php b/app/Models/User.php
+index af2926f..819064a 100644
+--- a/app/Models/User.php
++++ b/app/Models/User.php
+@@ -34,7 +34,6 @@ protected function casts(): array
+         return [
+             'email_verified_at' => 'datetime',
+             'password' => 'hashed',
+-            'birth_date' => 'date',
+         ];
+     }
+ 
+diff --git a/tests/Feature/ProfileTest.php b/tests/Feature/ProfileTest.php
+index 984f050..3f5f243 100644
+--- a/tests/Feature/ProfileTest.php
++++ b/tests/Feature/ProfileTest.php
+@@ -87,3 +87,26 @@
+ 
+     $this->assertNotNull($user->fresh());
+ });
++
++test('birth date can be updated via profile form', function () {
++    $user = User::factory()->create([
++        'birth_date' => '2000-01-01',
++    ]);
++
++    $this->actingAs($user);
++
++    $response = $this->put(route('profile.update'), [
++        'name' => $user->name,
++        'email' => $user->email,
++        'phone' => '081234567890',
++        'gender' => 'Laki-laki',
++        'birth_date' => '1995-06-15',
++        'address' => 'Jl. Test No. 1',
++    ]);
++
++    $response->assertRedirect(route('profile'));
++
++    $user->refresh();
++
++    $this->assertSame('1995-06-15', $user->birth_date);
++});

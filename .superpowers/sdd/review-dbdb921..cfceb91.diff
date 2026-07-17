@@ -1,0 +1,44 @@
+# Review package: dbdb921..cfceb91
+
+## Commits
+cfceb91 feat: add photo upload handling with validation and storage
+
+## Files changed
+ app/Http/Controllers/ProfileController.php | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+## Diff
+diff --git a/app/Http/Controllers/ProfileController.php b/app/Http/Controllers/ProfileController.php
+index 55d6a26..7e1bfb3 100644
+--- a/app/Http/Controllers/ProfileController.php
++++ b/app/Http/Controllers/ProfileController.php
+@@ -5,6 +5,7 @@
+ use Illuminate\Http\Request;
+ use Illuminate\Support\Facades\Auth;
+ use Illuminate\Support\Facades\Hash;
++use Illuminate\Support\Facades\Storage;
+ use Illuminate\Validation\Rule;
+ 
+ class ProfileController extends Controller
+@@ -45,9 +46,21 @@ public function update(Request $request)
+             'address' => 'nullable|string',
+ 
+             'password' => 'nullable|min:8|confirmed',
++            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+ 
+         ]);
+ 
++        if ($request->hasFile('photo')) {
++            // Delete old photo if exists
++            if ($user->photo) {
++                Storage::disk('public')->delete($user->photo);
++            }
++            
++            // Store new photo
++            $photo = $request->file('photo')->store('photos', 'public');
++            $user->photo = $photo;
++        }
++
+         // Update data user
+         $user->update([
+             'name' => $validated['name'],

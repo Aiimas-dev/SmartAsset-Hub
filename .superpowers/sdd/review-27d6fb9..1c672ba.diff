@@ -1,0 +1,23 @@
+# Review package: 27d6fb9..1c672ba
+
+## Commits
+1c672ba fix: update date input format for birth_date field
+
+## Files changed
+ resources/views/profile.blade.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+## Diff
+diff --git a/resources/views/profile.blade.php b/resources/views/profile.blade.php
+index 2ec163e..8af71e0 100644
+--- a/resources/views/profile.blade.php
++++ b/resources/views/profile.blade.php
+@@ -255,7 +255,7 @@ class="mt-2 w-full rounded-2xl border border-gray-300 p-4 focus:ring-2 focus:rin
+                             <input
+                                 type="date"
+                                 name="birth_date"
+-                                value="{{ $user->birth_date }}"
++                                value="{{ old('birth_date', $user->birth_date ? \Carbon\Carbon::parse($user->birth_date)->format('Y-m-d') : '') }}"
+                                 class="mt-2 w-full rounded-2xl border border-gray-300 p-4 focus:ring-2 focus:ring-sky-300">
+ 
+                         </div>

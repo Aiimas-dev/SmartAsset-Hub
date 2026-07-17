@@ -1,0 +1,57 @@
+# Review package: 1eaa860..21d91eb
+
+## Commits
+21d91eb fix: use update() method for reliable profile persistence
+
+## Files changed
+ app/Http/Controllers/ProfileController.php | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
+
+## Diff
+diff --git a/app/Http/Controllers/ProfileController.php b/app/Http/Controllers/ProfileController.php
+index 23cfc30..2c2ba96 100644
+--- a/app/Http/Controllers/ProfileController.php
++++ b/app/Http/Controllers/ProfileController.php
+@@ -24,9 +24,6 @@ public function index()
+      */
+     public function update(Request $request)
+     {
+-        // CEK APAKAH FORM MENGIRIM DATA
+-        dd($request->all());
+-
+         $user = Auth::user();
+ 
+         $validated = $request->validate([
+@@ -52,21 +49,21 @@ public function update(Request $request)
+         ]);
+ 
+         // Update data user
+-        $user->name = $validated['name'];
+-        $user->email = $validated['email'];
+-        $user->phone = $validated['phone'] ?? null;
+-        $user->gender = $validated['gender'] ?? null;
+-        $user->birth_date = $validated['birth_date'] ?? null;
+-        $user->address = $validated['address'] ?? null;
++        $user->update([
++            'name' => $validated['name'],
++            'email' => $validated['email'],
++            'phone' => $validated['phone'] ?? null,
++            'gender' => $validated['gender'] ?? null,
++            'birth_date' => $validated['birth_date'] ?? null,
++            'address' => $validated['address'] ?? null,
++        ]);
+ 
+         // Kalau password diisi
+         if (!empty($validated['password'])) {
+             $user->password = Hash::make($validated['password']);
++            $user->save();
+         }
+ 
+-        $user->save();
+-
+-        $user = $user->fresh();
+-        dd($user);
++        return redirect()->route('profile')->with('success', 'Profile berhasil diperbarui!');
+     }
+ }
+\ No newline at end of file
